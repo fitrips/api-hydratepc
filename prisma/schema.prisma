@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Admin
+  Member
+}
+
+model User {
+  
+  id String @id @unique @default(uuid())
+  email String       @db.VarChar(100)
+  username  String       @db.VarChar(100)
+  password String    @db.VarChar(100)
+  role Role @default(Member)
+  token    String?   @db.VarChar(100)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  detail DetailUser []
+  daily DailyIntake []
+
+  @@map("users")
+}
+
+model Artikel {
+  id String @id @unique @default(uuid())
+  judul String @db.VarChar(100)
+  poin String @db.VarChar(100)
+  konten String @db.VarChar(150)
+  image_url String @db.VarChar(255)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("artikel")
+}
+
+model DetailUser {
+  id String @id @unique @default(uuid())
+  berat_badan Int
+  jenis_kelamin String 
+  cuaca String
+  kebutuhanAir Int
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("detail_users")
+}
+
+model DailyIntake {
+  id        String   @id @default(uuid())
+  userId    String
+  date      DateTime @default(now())
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("daily_intake")
+}
